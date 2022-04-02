@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<input id="input" type="text" value=""/>
+<button onclick="send()">Enviar</button>
+<pre id="output"></pre>
+<script>
+    const input = document.getElementById("input");
+    const output = document.getElementById("output");
+    const socket = new WebSocket("ws://localhost:8081/echo");
+
+    socket.onopen = function () {
+        output.innerHTML += "Status: Connected\n";
+    };
+
+    socket.onmessage = function (e) {
+        output.innerHTML += "Server: " + e.data + "\n";
+    };
+
+    socket.onerror = function (e) {
+        output.innerHTML += "Error: " + e.data + "\n";
+    };
+
+    function send() {
+        let value = new Date()
+        socket.send(value.toString());
+        input.value = "";
+    }
+</script>
+
+</body>
+</html>
