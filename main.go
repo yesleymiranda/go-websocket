@@ -1,21 +1,29 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/yesleymiranda/go-websocket/server/application"
+	"github.com/yesleymiranda/go-toolkit/webapplication"
+	"github.com/yesleymiranda/go-websocket/server/chat"
 	"github.com/yesleymiranda/go-websocket/server/login"
 )
 
+const port = "8081"
+
 func main() {
-	app := application.New("8081")
+	app := webapplication.New(&webapplication.ApplicationConfig{
+		Port:     port,
+		WithPing: true,
+	})
+	app.Initialize()
 
-	application.Index()
-	login.Login()
+	hub := chat.New()
+	go hub.Run()
 
-	err := http.ListenAndServe(fmt.Sprintf(":%s", app.Port), nil)
-	if err != nil {
-		panic("error o listen and serve")
-	}
+	wireups(app, hub)
+
+	_ = app.ListenAndServe()
+}
+
+func wireups(app *webapplication.App, hub *chat.Hub) {
+	chat.Bind(app, hub)
+	login.Bind(app, hub)
 }

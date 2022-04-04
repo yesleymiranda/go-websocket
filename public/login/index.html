@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Little Game</title>
+</head>
+<body>
+<form>
+    <label for="username">Nome usuário</label>
+    <input id="username" name="username" value="yeye">
+
+    <label for="password">Senha</label>
+    <input id="password" name="password" type="password" value="12345">
+
+    <input type="submit" value="Entrar">
+</form>
+
+<script>
+
+    const xGameToken = "x-little-game-token";
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        const data = new FormData(e.target);
+        const values = Object.fromEntries(data.entries());
+        const response = await fetch("/login", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(values),
+        });
+
+        response.json().then(res => {
+            setTokenCookie(res);
+            window.location.href = "/";
+        }).catch(e => {
+            alert("error on login:" +
+                " " + e)
+        });
+    }
+
+    function setTokenCookie(token) {
+        sessionStorage.setItem(xGameToken, token)
+    }
+
+    function clearToken() {
+        sessionStorage.removeItem(xGameToken)
+    }
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit);
+    clearToken();
+
+</script>
+</body>
+</html>
